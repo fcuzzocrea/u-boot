@@ -1,0 +1,6 @@
+BeagleBoard Beagle-V Fire
+M:	Francescodario Cuzzocrea <bosconovic@gmail.com>
+S:	Maintained
+F:	board/beaglebload/beaglev_fire/
+F:	include/configs/beagleboard_beaglev_fire.h
+F:	configs/beagleboard_beaglev_fire_defconfig

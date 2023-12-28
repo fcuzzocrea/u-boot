@@ -1,0 +1,135 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (C) 2023 Francescodario Cuzzocrea <bosconovic@gmail.com>
+ */
+
+/dts-v1/;
+
+#include "mpfs.dtsi"
+#include "mpfs-beaglev-fire-fabric.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/leds/common.h>
+
+/* Clock frequency (in Hz) of the rtcclk */
+#define RTCCLK_FREQ		1000000
+
+/ {
+	model = "BeagleBoard BeagleV-Fire";
+	compatible = "microchip,mpfs-icicle-reference-rtlv2210", "beagleboard,beaglev-fire",
+		     "microchip,mpfs";
+
+	aliases {
+		serial0 = &mmuart0;
+		ethernet0 = &mac1;
+		spi0 = &qspi;
+	};
+
+	chosen {
+		stdout-path = "serial0";
+	};
+
+	cpus {
+		timebase-frequency = <RTCCLK_FREQ>;
+	};
+
+	ddrc_cache_lo: memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x40000000>;
+		status = "okay";
+	};
+
+	ddrc_cache_hi: memory@1040000000 {
+		device_type = "memory";
+		reg = <0x10 0x40000000 0x0 0x40000000>;
+		status = "okay";
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		hss_payload: region@BFC00000 {
+			reg = <0x0 0xBFC00000 0x0 0x400000>;
+			no-map;
+		};
+	};
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <100000>;
+
+	pac193x: pac193x@10 {
+		compatible = "microchip,pac1934";
+		reg = <0x10>;
+		samp-rate = <64>;
+		status = "okay";
+		ch1: channel0 {
+			uohms-shunt-res = <10000>;
+			rail-name = "VDDREG";
+			channel_enabled;
+		};
+		ch2: channel1 {
+			uohms-shunt-res = <10000>;
+			rail-name = "VDDA25";
+			channel_enabled;
+		};
+		ch3: channel2 {
+			uohms-shunt-res = <10000>;
+			rail-name = "VDD25";
+			channel_enabled;
+		};
+		ch4: channel3 {
+			uohms-shunt-res = <10000>;
+			rail-name = "VDDA_REG";
+			channel_enabled;
+		};
+	};
+};
+
+&mac1 {
+	phy-mode = "sgmii";
+	phy-handle = <&phy1>;
+	status = "okay";
+
+	phy1: ethernet-phy@9 {
+		reg = <9>;
+	};
+};
+
+&mmc {
+	bus-width = <4>;
+	disable-wp;
+	cap-sd-highspeed;
+	cap-mmc-highspeed;
+	mmc-ddr-1_8v;
+	mmc-hs200-1_8v;
+	sd-uhs-sdr12;
+	sd-uhs-sdr25;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
+	status = "okay";
+};
+
+&mmuart0 {
+	status = "okay";
+};
+
+&qspi {
+	status = "okay";
+	num-cs = <1>;
+	flash0: spi-nand@0 {
+		compatible = "spi-nand";
+		reg = <0x0>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <20000000>;
+		spi-cpol;
+		spi-cpha;
+	};
+};
+
+&refclk {
+	clock-frequency = <125000000>;
+};
